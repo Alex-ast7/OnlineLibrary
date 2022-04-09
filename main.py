@@ -4,6 +4,11 @@ from flask import Flask, render_template, redirect
 
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 
+from data.books import Books
+from data.users import User
+from data.comments import Comment
+from data.user_marks import UserMarks
+
 from data import db_session
 
 app = Flask(__name__)
