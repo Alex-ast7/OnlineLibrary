@@ -18,6 +18,8 @@ class Books(SqlAlchemyBase, SerializerMixin):
     image_link = sqlalchemy.Column(sqlalchemy.String,
                                    sqlalchemy.ForeignKey("users.id"))
     language = sqlalchemy.Column(sqlalchemy.String, sqlalchemy.ForeignKey('users.id'), nullable=True)
+    total_amount = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
+    amount_in_library = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
 
     comments = orm.relation("comments",
                             secondary="association_comments",
