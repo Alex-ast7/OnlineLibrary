@@ -40,6 +40,14 @@ def index():
 def blog():
     return render_template('blog.html')
 
+@app.route('/login-register')
+def login():
+    return render_template('login-register.html')
+
+@app.route('/product-details')
+def product():
+    return render_template('product-details.html')
+
 
 if __name__ == '__main__':
     db_session.global_init("db/onlineLibrary.db")
