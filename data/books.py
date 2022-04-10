@@ -21,10 +21,10 @@ class Books(SqlAlchemyBase, SerializerMixin):
     total_amount = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     amount_in_library = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
 
-    comments = orm.relation("comments",
+    comments = orm.relation("Comment",
                             secondary="association_comments",
                             backref="books")
-    marks = orm.relation("user_marks",
+    marks = orm.relation("UserMarks",
                          secondary="association_marks",
                          backref="books")
 

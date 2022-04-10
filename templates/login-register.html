@@ -765,58 +765,91 @@
 				<div class="row">
 					<div class="col-sm-12 col-md-12 col-xs-12 col-lg-6 mb--30 mb-lg--0">
 						<!-- Login Form s-->
-						<form action="#">
+						<form class="register-form" action="" method="post" novalidate>
+							{{ register_form.hidden_tag() }}
 							<div class="login-form">
 								<h4 class="login-title">Регистрация</h4>
 								<p><span class="font-weight-bold">Я новый пользователь</span></p>
 								<div class="row">
 									<div class="col-md-12 col-12 mb--15">
-										<label for="email">Фамилия и имя</label>
-										<input class="mb-0 form-control" type="text" id="name"
-											placeholder="Введите вашу фамилию и имя">
+										<label>{{ register_form.surname_and_name.label }}</label>
+										{{ register_form.surname_and_name(class="mb-0 form-control", placeholder="Введите вашу фамилию и имя") }}
 									</div>
 									<div class="col-12 mb--20">
-										<label for="email">Email</label>
-										<input class="mb-0 form-control" type="email" id="email" placeholder="Введите ваш email">
+										<label>{{ register_form.reg_email.label }}</label>
+										{{ register_form.reg_email(class="mb-0 form-control", placeholder="Введите ваш email") }}
 									</div>
 									<div class="col-lg-6 mb--20">
-										<label for="password">Пароль</label>
-										<input class="mb-0 form-control" type="password" id="password" placeholder="Введите ваш пароль">
+										<label>{{ register_form.reg_password.label }}</label>
+										{{ register_form.reg_password(class="mb-0 form-control", placeholder="Введите ваш пароль") }}
 									</div>
 									<div class="col-lg-6 mb--20">
-										<label for="password">Повторите пароль</label>
-										<input class="mb-0 form-control" type="password" id="repeat-password" placeholder="Повторите пароль">
+										<label>{{ register_form.repeat_password.label }}</label>
+										{{ register_form.repeat_password(class="mb-0 form-control", placeholder="Повторите пароль") }}
 									</div>
 									<div class="col-md-12">
-										<a href="#" class="btn btn-outlined">Регистрация</a>
+										{{ register_form.reg_submit(type="submit", for="register-form", class="btn btn-outlined register-btn") }}
 									</div>
 								</div>
 							</div>
 						</form>
 					</div>
 					<div class="col-sm-12 col-md-12 col-lg-6 col-xs-12">
-						<form action="./">
+						<form class="login-form" action="" method="post" novalidate>
+							{{ login_form.hidden_tag() }}
 							<div class="login-form">
 								<h4 class="login-title">Вход</h4>
 								<p><span class="font-weight-bold">У меня уже есть аккаунт</span></p>
 								<div class="row">
 									<div class="col-md-12 col-12 mb--15">
-										<label for="email">Email</label>
-										<input class="mb-0 form-control" type="email" id="email1"
-											placeholder="Введите ваш email">
+										<label>{{ login_form.email.label }}</label>
+										{{ login_form.email(class="mb-0 form-control", placeholder="Введите ваш email") }}
 									</div>
 									<div class="col-12 mb--20">
-										<label for="password">Пароль</label>
-										<input class="mb-0 form-control" type="password" id="login-password" placeholder="Введите пароль">
+										<label>{{ login_form.password.label }}</label>
+										{{ login_form.password(class="mb-0 form-control", placeholder="Введите пароль") }}
 									</div>
 									<div class="col-md-12">
-										<a href="#" class="btn btn-outlined">Вход</a>
+										{{ login_form.submit(type="submit", for="login-form", class="btn btn-outlined login-btn") }}
 									</div>
 								</div>
 							</div>
 						</form>
 					</div>
 				</div>
+			{% for error in register_form.surname_and_name.errors %}
+    		<div class="alert alert-success" role="alert">
+        		(Регистрация) Фамилия и имя: {{ error }}
+    		</div>
+			{% endfor %}
+			{% for error in register_form.reg_email.errors %}
+    		<div class="alert alert-success" role="alert">
+        		(Регистрация) Почта: {{ error }}
+    		</div>
+			{% endfor %}
+			{% for error in register_form.reg_password.errors %}
+    		<div class="alert alert-success" role="alert">
+        		(Регистрация) Пароль: {{ error }}
+    		</div>
+			{% endfor %}
+			{% for error in register_form.repeat_password.errors %}
+    		<div class="alert alert-success" role="alert">
+        		(Регистрация) Пароль еще раз: {{ error }}
+    		</div>
+			{% endfor %}
+			{% for error in login_form.email.errors %}
+    		<div class="alert alert-success" role="alert">
+        		(Вход) Почта: {{ error }}
+    		</div>
+			{% endfor %}
+			{% for error in login_form.password.errors %}
+    		<div class="alert alert-success" role="alert">
+        		(Вход) Пароль: {{ error }}
+    		</div>
+			{% endfor %}
+			{% if message %}
+				<div class="alert alert-success" role="alert">{{ message }}</div>
+			{% endif %}
 			</div>
 		</main>
 	</div>

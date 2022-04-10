@@ -9,7 +9,10 @@ from data.users import User
 from data.comments import Comment
 from data.user_marks import UserMarks
 
+from forms.user import RegisterForm, LoginForm
+
 from data import db_session
+
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -40,9 +43,37 @@ def index():
 def blog():
     return render_template('blog.html')
 
-@app.route('/login-register')
+
+@app.route('/login-register', methods=['GET', 'POST'])
 def login():
-    return render_template('login-register.html')
+    register_form = RegisterForm()
+    login_form = LoginForm()
+    if register_form.validate_on_submit():
+        db_sess = db_session.create_session()
+        if db_sess.query(User).filter(User.email == register_form.reg_email.data).first():
+            return render_template('login-register.html', register_form=register_form, login_form=login_form,
+                                   message='Такой пользователь уже есть')
+        user = User(
+            surname=register_form.surname_and_name.data.split()[0],
+            name=register_form.surname_and_name.data.split()[1],
+            email=register_form.reg_email.data,
+        )
+        user.set_password(register_form.reg_password.data)
+        db_sess.add(user)
+        db_sess.commit()
+        user = db_sess.query(User).filter(User.email == register_form.reg_email.data).first()
+        login_user(user)
+        return redirect('/')
+    elif login_form.validate_on_submit():
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.email == login_form.email.data).first()
+        if user and user.check_password(login_form.password.data):
+            login_user(user)
+            return redirect("/")
+        return render_template('login-register.html', register_form=register_form, login_form=login_form,
+                               message='Неверный логин или пароль')
+    return render_template('login-register.html', register_form=register_form, login_form=login_form)
+
 
 @app.route('/product-details')
 def product():
@@ -51,5 +82,6 @@ def product():
 
 if __name__ == '__main__':
     db_session.global_init("db/onlineLibrary.db")
+    db_sess = db_session.create_session()
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
