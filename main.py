@@ -39,11 +39,6 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/blog')
-def blog():
-    return render_template('blog.html')
-
-
 @app.route('/login-register', methods=['GET', 'POST'])
 def login():
     register_form = RegisterForm()
