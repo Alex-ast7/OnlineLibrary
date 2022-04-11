@@ -18,3 +18,4 @@ class Comment(SqlAlchemyBase):
                            autoincrement=True)
     text = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     user = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'))
+    date_time = sqlalchemy.Column(sqlalchemy.DateTime, nullable=True)
