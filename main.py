@@ -70,9 +70,14 @@ def login():
     return render_template('login-register.html', register_form=register_form, login_form=login_form)
 
 
-@app.route('/product-details')
-def product():
-    return render_template('product-details.html')
+@app.route('/product-details/<int:id>')
+def product(id):
+    books = Books()
+    # db_sess = db_session.create_session()
+    # data = db_sess.query(books).filter(books.id == id).first()
+    # print(data)
+    data = {'title': 'Капитанская дочка', 'author': 'Пушкин', 'description': 'Здесь будет описание', 'genre': 'Роман', 'language': 'Русский', 'total_amount': '30', 'amount_in_library': '15'}
+    return render_template('product-details.html', params=data)
 
 
 if __name__ == '__main__':
