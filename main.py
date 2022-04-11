@@ -9,7 +9,7 @@ from data.users import User
 from data.comments import Comment
 from data.user_marks import UserMarks
 
-from forms.user import RegisterForm, LoginForm
+from forms.user import RegisterForm, LoginForm, EditProfileForm
 
 from data import db_session
 
@@ -48,11 +48,13 @@ def login():
         if db_sess.query(User).filter(User.email == register_form.reg_email.data).first():
             return render_template('login-register.html', register_form=register_form, login_form=login_form,
                                    message='Такой пользователь уже есть')
-        user = User(
-            surname=register_form.surname_and_name.data.split()[0],
-            name=register_form.surname_and_name.data.split()[1],
-            email=register_form.reg_email.data,
-        )
+        user = User(email=register_form.reg_email.data)
+        name_surname = register_form.surname_and_name.data.split()
+        if len(name_surname) >= 2:
+            user.surname = name_surname[0]
+            user.name = ' '.join(name_surname[1:])
+        elif len(name_surname) < 2:
+            user.name = name_surname
         user.set_password(register_form.reg_password.data)
         db_sess.add(user)
         db_sess.commit()
@@ -68,6 +70,16 @@ def login():
         return render_template('login-register.html', register_form=register_form, login_form=login_form,
                                message='Неверный логин или пароль')
     return render_template('login-register.html', register_form=register_form, login_form=login_form)
+
+
+@app.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    edit_profile_form = EditProfileForm()
+    if edit_profile_form.validate_on_submit():
+        print(111)
+        return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form, message='Изменения (пока еще) не сохранены')
+    return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form)
 
 
 @app.route('/product-details')

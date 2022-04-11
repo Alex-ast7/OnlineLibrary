@@ -17,3 +17,13 @@ class RegisterForm(FlaskForm):
                                     validators=[DataRequired(message='Это поле обязательное'),
                                                 EqualTo('reg_password', message='Пароли не совпадают')])
     reg_submit = SubmitField('Регистрация')
+
+
+class EditProfileForm(FlaskForm):
+    surname = StringField('Фамилия', validators=[DataRequired(message='Это поле обязательное')])
+    name = StringField('Имя', validators=[DataRequired(message='Это поле обязательное')])
+    reg_email = EmailField('Email', validators=[DataRequired(message='Это поле обязательное')])
+    phone = StringField('Номер телефона', validators=[])
+    old_password = PasswordField('Старый пароль', validators=[])
+    new_password = PasswordField('Новый пароль', validators=[])
+    reg_submit = SubmitField('Сохранить')
