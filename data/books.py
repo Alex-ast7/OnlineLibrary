@@ -15,9 +15,9 @@ class Books(SqlAlchemyBase, SerializerMixin):
     isbn_13 = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     isbn_10 = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     genre = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    image_link = sqlalchemy.Column(sqlalchemy.String,
-                                   sqlalchemy.ForeignKey("users.id"))
-    language = sqlalchemy.Column(sqlalchemy.String, sqlalchemy.ForeignKey('users.id'), nullable=True)
+    image_link = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    small_image_link = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    language = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     total_amount = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     amount_in_library = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
 
