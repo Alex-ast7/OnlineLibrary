@@ -77,14 +77,16 @@ def login():
 def edit_profile():
     edit_profile_form = EditProfileForm()
     if edit_profile_form.validate_on_submit():
-        print(111)
         return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form, message='Изменения (пока еще) не сохранены')
     return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form)
 
 
-@app.route('/product-details')
-def product():
-    return render_template('product-details.html')
+@app.route('/product-details/<int:id>')
+def product(id):
+    db_sess = db_session.create_session()
+    book = db_sess.query(Books).filter(Books.id == id).first()
+    data = {'title': book.title, 'author': book.author, 'description': book.description, 'genre': book.genre, 'language': book.language, 'total_amount': book.total_amount, 'amount_in_library': book.amount_in_library}
+    return render_template('product-details.html', params=data)
 
 
 if __name__ == '__main__':
