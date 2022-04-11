@@ -72,11 +72,9 @@ def login():
 
 @app.route('/product-details/<int:id>')
 def product(id):
-    books = Books()
-    # db_sess = db_session.create_session()
-    # data = db_sess.query(books).filter(books.id == id).first()
-    # print(data)
-    data = {'title': 'Капитанская дочка', 'author': 'Пушкин', 'description': 'Здесь будет описание', 'genre': 'Роман', 'language': 'Русский', 'total_amount': '30', 'amount_in_library': '15'}
+    db_sess = db_session.create_session()
+    book = db_sess.query(Books).filter(Books.id == id).first()
+    data = {'title': book.title, 'author': book.author, 'description': book.description, 'genre': book.genre, 'language': book.language, 'total_amount': book.total_amount, 'amount_in_library': book.amount_in_library}
     return render_template('product-details.html', params=data)
 
 
