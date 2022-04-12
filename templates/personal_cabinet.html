@@ -792,10 +792,13 @@
 									</div>
 									<div class="col-lg-6 mb--20">
 										<label>{{ edit_profile_form.new_password.label }}</label>
-										{{ edit_profile_form.new_password(class="mb-0 form-control", placeholder="Повторите пароль") }}
+										{{ edit_profile_form.new_password(class="mb-0 form-control", placeholder="Придумайте новый пароль") }}
+									</div>
+									<div class="col-md-12 mb--20">
+										{{ edit_profile_form.reg_submit(type="submit", for="edit-profile-form", class="btn btn-outlined edit-profile-btn") }}
 									</div>
 									<div class="col-md-12">
-										{{ edit_profile_form.reg_submit(type="submit", for="edit-profile-form", class="btn btn-outlined edit-profile-btn") }}
+										<a href="/logout" class="btn btn-outlined">Выйти</a>
 									</div>
 								</div>
 								<br>
