@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template, redirect
+from flask import Flask, render_template, redirect, request
 
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 
@@ -76,8 +76,43 @@ def login():
 @login_required
 def edit_profile():
     edit_profile_form = EditProfileForm()
+
+    if request.method == 'GET':
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.id == current_user.id).first()
+
+        edit_profile_form.surname.data = user.surname
+        edit_profile_form.name.data = user.name
+        edit_profile_form.reg_email.data = user.email
+        edit_profile_form.phone.data = user.phone
+
     if edit_profile_form.validate_on_submit():
-        return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form, message='Изменения (пока еще) не сохранены')
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.id == current_user.id).first()
+
+        user.surname = edit_profile_form.surname.data
+        user.name = edit_profile_form.name.data
+        user.email = edit_profile_form.reg_email.data
+        user.phone = edit_profile_form.phone.data
+
+        db_sess.commit()
+
+        if edit_profile_form.old_password.data and edit_profile_form.new_password.data:
+            if user.check_password(edit_profile_form.old_password.data):
+                user.set_password(edit_profile_form.new_password.data)
+                db_sess.commit()
+            else:
+                return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
+                                       message='Изменения сохранены, но пароль не изменён - старый пароль указан неверно')
+        elif edit_profile_form.old_password.data and not edit_profile_form.new_password.data:
+            return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
+                                   message='Изменения сохранены, но пароль не изменён. Заполните поле "Новый пароль"')
+        elif edit_profile_form.new_password.data and not edit_profile_form.old_password.data:
+            return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
+                                   message='Изменения сохранены, но пароль не изменён - для его смены укажите старый пароль')
+
+        return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
+                               message='Изменения сохранены')
     return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form)
 
 
@@ -91,6 +126,5 @@ def product(id):
 
 if __name__ == '__main__':
     db_session.global_init("db/onlineLibrary.db")
-    db_sess = db_session.create_session()
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
