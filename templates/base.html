@@ -36,8 +36,12 @@
 							<div class="main-navigation flex-lg-right">
 								<div class="cart-widget">
 									<div class="login-block">
-										<a href="/login-register" class="font-weight-bold">Login</a> <br>
-										<span>or</span><a href="/login-register">Register</a>
+                                        {% if current_user.is_authenticated %}
+                                            <a href="/edit_profile">{{ current_user.name }}</a>
+                                        {% else %}
+                                            <a href="/login-register" class="font-weight-bold">Login</a> <br>
+                                            <span>or</span><a href="/login-register">Register</a>
+                                        {% endif %}
 									</div>
                                 </div>
                             </div>
