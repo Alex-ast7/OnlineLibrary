@@ -47,7 +47,7 @@ def login():
         db_sess = db_session.create_session()
         if db_sess.query(User).filter(User.email == register_form.reg_email.data).first():
             return render_template('login-register.html', register_form=register_form, login_form=login_form,
-                                   message='Такой пользователь уже есть')
+                                   message='Такой пользователь уже есть', form='register')
         user = User(email=register_form.reg_email.data)
         name_surname = register_form.surname_and_name.data.split()
         if len(name_surname) >= 2:
@@ -68,7 +68,7 @@ def login():
             login_user(user)
             return redirect("/")
         return render_template('login-register.html', register_form=register_form, login_form=login_form,
-                               message='Неверный логин или пароль')
+                               message='Неверный логин или пароль', form='login')
     return render_template('login-register.html', register_form=register_form, login_form=login_form)
 
 
