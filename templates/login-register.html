@@ -788,7 +788,7 @@
 										{{ register_form.repeat_password(class="mb-0 form-control", for="register-form", placeholder="Повторите пароль") }}
 									</div>
 									<div class="col-md-12">
-										{{ register_form.reg_submit(type="submit", for="register-form", class="btn btn-outlined register-btn") }}
+										{{ register_form.reg_submit(type="submit", onclick="{{ form='register' }}", for="register-form", class="btn btn-outlined register-btn") }}
 									</div>
 								</div>
 							</div>
@@ -810,13 +810,14 @@
 										{{ login_form.password(class="mb-0 form-control", for="login-form", placeholder="Введите пароль") }}
 									</div>
 									<div class="col-md-12">
-										{{ login_form.submit(type="submit", for="login-form", class="btn btn-outlined login-btn") }}
+										{{ login_form.submit(type="submit", onclick="{{ form='login' }}", for="login-form", class="btn btn-outlined login-btn") }}
 									</div>
 								</div>
 							</div>
 						</form>
 					</div>
 				</div>
+			{{ form }}
 			{% if form != "login" %}
 				{% for error in register_form.surname_and_name.errors %}
 				<div class="alert alert-success" role="alert">

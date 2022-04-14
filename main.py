@@ -63,7 +63,7 @@ def login():
             user.surname = name_surname[0]
             user.name = ' '.join(name_surname[1:])
         elif len(name_surname) < 2:
-            user.name = name_surname
+            user.name = name_surname[0]
         user.set_password(register_form.reg_password.data)
         db_sess.add(user)
         db_sess.commit()
