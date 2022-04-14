@@ -36,7 +36,16 @@ def logout():
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('index.html')
+    db_sess = db_session.create_session()
+    book = db_sess.query(Books).all()
+    data = []
+    for i in book:
+        if len(i.title) > 13:
+            i.title = i.title[0:14] + '...'
+        if len(i.author) > 13:
+            i.author = i.author[0:14] + '...'
+        data.append({'title': i.title, 'author': i.author, 'total_amount': i.total_amount, 'amount_in_library': i.amount_in_library})
+    return render_template('index.html', data=data)
 
 
 @app.route('/login-register', methods=['GET', 'POST'])
@@ -54,7 +63,7 @@ def login():
             user.surname = name_surname[0]
             user.name = ' '.join(name_surname[1:])
         elif len(name_surname) < 2:
-            user.name = name_surname
+            user.name = name_surname[0]
         user.set_password(register_form.reg_password.data)
         db_sess.add(user)
         db_sess.commit()
@@ -119,9 +128,21 @@ def edit_profile():
 @app.route('/product-details/<int:id>')
 def product(id):
     db_sess = db_session.create_session()
+
     book = db_sess.query(Books).filter(Books.id == id).first()
-    data = {'title': book.title, 'author': book.author, 'description': book.description, 'genre': book.genre, 'language': book.language, 'total_amount': book.total_amount, 'amount_in_library': book.amount_in_library}
-    return render_template('product-details.html', params=data)
+    params = {'title': book.title, 'author': book.author, 'description': book.description, 'genre': book.genre, 'language': book.language, 'total_amount': book.total_amount, 'amount_in_library': book.amount_in_library}
+    book = db_sess.query(Books).all()
+    data = []
+    for i in book:
+        if len(i.title) > 13:
+            i.title = i.title[0:14] + '...'
+        if len(i.author) > 13:
+            i.author = i.author[0:14] + '...'
+        data.append({'title': i.title, 'author': i.author,
+                     'total_amount': i.total_amount,
+                     'amount_in_library': i.amount_in_library})
+    print(id)
+    return render_template('product-details.html', params=params, data=data)
 
 
 if __name__ == '__main__':
