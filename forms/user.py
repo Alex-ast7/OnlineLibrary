@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, EmailField
+from wtforms import StringField, PasswordField, SubmitField, EmailField, FileField
 from wtforms.validators import DataRequired, EqualTo
 
 
@@ -20,6 +20,7 @@ class RegisterForm(FlaskForm):
 
 
 class EditProfileForm(FlaskForm):
+    photo = FileField('Выберите файл')
     surname = StringField('Фамилия', validators=[DataRequired(message='Это поле обязательное')])
     name = StringField('Имя', validators=[DataRequired(message='Это поле обязательное')])
     reg_email = EmailField('Email', validators=[DataRequired(message='Это поле обязательное')])

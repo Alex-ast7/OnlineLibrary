@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+<link rel="stylesheet" type="text/css" media="screen" href="../static/css/upload_file.css" />
 <!--	<div class="site-wrapper" id="top">-->
 <!--		<div class="site-header d-none d-lg-block">-->
 <!--			<div class="header-middle pt&#45;&#45;10 pb&#45;&#45;10">-->
@@ -769,6 +770,11 @@
 							{{ edit_profile_form.hidden_tag() }}
 							<div class="login-form" style="margin-left: 50%; margin-right: -50%; width=120%">
 								<div class="row">
+									<div class="col-md-12 col-12 mb--15" id="upload-container">
+										<img id="upload-image" src="../static/img/button_upload_file.bmp" width=100 height=100>
+										{{ edit_profile_form.photo(class="mb-0 form-control", id="file-input", type="file") }}
+										<label for="file-input">Выберите файл для аватарки</label>
+          							</div>
 									<div class="col-md-12 col-12 mb--15">
 										<label>{{ edit_profile_form.surname.label }}</label>
 										{{ edit_profile_form.surname(class="mb-0 form-control", placeholder="Введите вашу фамилию") }}
