@@ -16,8 +16,8 @@ for i in books:
         isbn_13 = data['items'][0]['volumeInfo']['industryIdentifiers'][0]['identifier']
         isbn_10 = data['items'][0]['volumeInfo']['industryIdentifiers'][1]['identifier']
         genre = ', '.join(data['items'][0]['volumeInfo']['categories'])
-        image_link = data['items'][8]['volumeInfo']['imageLinks']['smallThumbnail']
-        language = data['items'][2]['volumeInfo']['language']
+        image_link = data['items'][0]['volumeInfo']['imageLinks']['thumbnail']
+        language = data['items'][0]['volumeInfo']['language']
         add = Books(title=title, author=author, description=description, isbn_13=isbn_13, isbn_10=isbn_10, genre=genre, image_link=image_link, language=language)
         dbsess.add(add)
         dbsess.commit()
