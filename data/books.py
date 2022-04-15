@@ -29,4 +29,4 @@ class Books(SqlAlchemyBase, SerializerMixin):
                          backref="books")
 
     def __repr__(self):
-        return f'<Book> {self.id}, {self.title}, {self.author}, {self.isbn_13}, {self.total_amount}, {self.amount_in_library}'
+        return f'<Book> {self.id}, {self.title}, {self.author}, {self.isbn_13}, {self.total_amount}, {self.amount_in_library}, {self.image_link}'
