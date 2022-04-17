@@ -1,3 +1,4 @@
+import datetime
 import os
 
 from flask import Flask, render_template, redirect, request
@@ -9,9 +10,9 @@ from data.users import User
 from data.comments import Comment
 from data.user_marks import UserMarks
 from PIL import Image
-import requests
 
 from forms.user import RegisterForm, LoginForm, EditProfileForm
+from forms.comments import AddCommentForm
 
 from data import db_session
 
@@ -20,6 +21,36 @@ app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'dnuiwy38noqmcxq8yr1FV&^npmNZB6ernm;s,c/'
+
+
+def info(id):
+    db_sess = db_session.create_session()
+
+    book = db_sess.query(Books).filter(Books.id == id).first()
+    params = {'title': book.title, 'author': book.author,
+              'description': book.description, 'genre': book.genre,
+              'language': book.language, 'total_amount': book.total_amount,
+              'amount_in_library': book.amount_in_library,
+              'image_link': book.image_link}
+
+    book = db_sess.query(Books).all()
+    data = []
+    for i in book:
+        if len(i.title) > 13:
+            i.title = i.title[0:14] + '...'
+        if len(i.author) > 13:
+            i.author = i.author[0:14] + '...'
+        data.append({'title': i.title, 'author': i.author,
+                     'total_amount': i.total_amount,
+                     'amount_in_library': i.amount_in_library,
+                     'image_link': i.image_link})
+    book_comments = []
+    db_sess = db_session.create_session()
+    for comment in db_sess.query(Comment).filter(Comment.book_id == id).all():
+        for user in db_sess.query(User).filter(User.id == comment.user).all():
+            book_comments.append([comment.text, comment.date_time, comment.stars, user.name, user.surname])
+
+    return params, data, book_comments, len(book_comments)
 
 
 @login_manager.user_loader
@@ -127,25 +158,32 @@ def edit_profile():
     return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form)
 
 
-@app.route('/product-details/<int:id>')
+@app.route('/product-details/<int:id>', methods=['GET', 'POST'])
 def product(id):
     db_sess = db_session.create_session()
+    if request.method == 'POST':
+        form = AddCommentForm()
+        comment = Comment()
+        comment.text = form.text.data
+        comment.user = current_user.id
+        if form.star1.data:
+            comment.stars = 5
+        elif form.star2.data:
+            comment.stars = 4
+        elif form.star3.data:
+            comment.stars = 3
+        elif form.star4.data:
+            comment.stars = 2
+        elif form.star5.data:
+            comment.stars = 1
+        comment.book_id = id
+        db_sess.add(comment)
+        db_sess.commit()
+        return redirect(f'/product-details/{id}')
 
-    book = db_sess.query(Books).filter(Books.id == id).first()
-    params = {'title': book.title, 'author': book.author, 'description': book.description, 'genre': book.genre, 'language': book.language, 'total_amount': book.total_amount, 'amount_in_library': book.amount_in_library, 'image_link': book.image_link}
-    book = db_sess.query(Books).all()
-    data = []
-    for i in book:
-        if len(i.title) > 13:
-            i.title = i.title[0:14] + '...'
-        if len(i.author) > 13:
-            i.author = i.author[0:14] + '...'
-        data.append({'title': i.title, 'author': i.author,
-                     'total_amount': i.total_amount,
-                     'amount_in_library': i.amount_in_library, 'image_link': i.image_link})
-    print(id)
-    return render_template('product-details.html', params=params, data=data)
-
+    params, data, book_comments, count = info(id)
+    form = AddCommentForm()
+    return render_template('product-details.html', params=params, data=data, form=form, book_comments=book_comments, count=count)
 
 if __name__ == '__main__':
     db_session.global_init("db/onlineLibrary.db")

@@ -739,8 +739,8 @@
                 <div class="breadcrumb-contents">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
-<!--                            <li class="breadcrumb-item"><a href="index.html">Home</a></li>-->
-<!--                            <li class="breadcrumb-item active">Product Details</li>-->
+                            <li class="breadcrumb-item"><a href="/index">Home</a></li>
+                            <li class="breadcrumb-item active">{{ params['title'] }}</li>
                         </ol>
                     </nav>
                 </div>
@@ -853,73 +853,84 @@
                         </div>
                         <div class="tab-pane fade" id="tab-2" role="tabpanel" aria-labelledby="tab2">
                             <div class="review-wrapper">
-                                <h2 class="title-lg mb--20">1 REVIEW FOR AUCTOR GRAVIDA ENIM</h2>
+                                <h2 class="title-lg mb--20">Отзывов на данную книгу {{ count }}</h2>
+                                {% for item in book_comments %}
                                 <div class="review-comment mb--20">
+
+
                                     <div class="avatar">
                                         <img src="image/icon/author-logo.png" alt="">
                                     </div>
-                                    <div class="text">
-                                        <div class="rating-block mb--15">
-                                            <span class="ion-android-star-outline star_on"></span>
-                                            <span class="ion-android-star-outline star_on"></span>
-                                            <span class="ion-android-star-outline star_on"></span>
-                                            <span class="ion-android-star-outline"></span>
-                                            <span class="ion-android-star-outline"></span>
+                                        <div class="text">
+                                            <div class="rating-block mb--15">
+                                                {% for star in range(item[2]) %}
+                                                    <span class="ion-android-star-outline star_on"></span>
+                                                {% endfor %}
+                                                {% for star in range(5 - item[2]) %}
+                                                    <span class="ion-android-star-outline"></span>
+                                                {% endfor %}
+<!--                                                <span class="ion-android-star-outline star_on"></span>-->
+<!--                                                <span class="ion-android-star-outline star_on"></span>-->
+<!--                                                <span class="ion-android-star-outline"></span>-->
+<!--                                                <span class="ion-android-star-outline"></span>-->
+                                            </div>
+                                            <h6 class="author">{{ item[3] }} {{ item[4] }} – <span class="font-weight-400">{{ item[1] }}</span>
+                                            </h6>
+                                            <p>{{ item[0] }}</p>
                                         </div>
-                                        <h6 class="author">ADMIN – <span class="font-weight-400">March 23, 2015</span>
-                                        </h6>
-                                        <p>Lorem et placerat vestibulum, metus nisi posuere nisl, in accumsan elit odio
-                                            quis mi.</p>
-                                    </div>
+
                                 </div>
-                                <h2 class="title-lg mb--20 pt--15">ADD A REVIEW</h2>
+                                {% endfor %}
+                                <h2 class="title-lg mb--20 pt--15">Добавьте отзыв</h2>
                                 <div class="rating-row pt-2">
-                                    <p class="d-block">Your Rating</p>
-                                    <span class="rating-widget-block">
-                                        <input type="radio" name="star" id="star1">
-                                        <label for="star1"></label>
-                                        <input type="radio" name="star" id="star2">
-                                        <label for="star2"></label>
-                                        <input type="radio" name="star" id="star3">
-                                        <label for="star3"></label>
-                                        <input type="radio" name="star" id="star4">
-                                        <label for="star4"></label>
-                                        <input type="radio" name="star" id="star5">
-                                        <label for="star5"></label>
-                                    </span>
-                                    <form action="./" class="mt--15 site-form ">
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <div class="form-group">
-                                                    <label for="message">Comment</label>
-                                                    <textarea name="message" id="message" cols="30" rows="10"
-                                                        class="form-control"></textarea>
+                                    <form action="" method="post">
+                                        <p class="d-block">Рейтинг</p>
+                                        <span class="rating-widget-block">
+                                            {{ form.star1(class="form-control", type="checkbox", id="star1") }}
+                                            <label for="star1"></label>
+                                            {{ form.star2(class="form-control", type="checkbox", id="star2") }}
+                                            <label for="star2"></label>
+                                            {{ form.star3(class="form-control", type="checkbox", id="star3") }}
+                                            <label for="star3"></label>
+                                           {{ form.star4(class="form-control", type="checkbox", id="star4") }}
+                                            <label for="star4"></label>
+                                            {{ form.star5(class="form-control", type="checkbox", id="star5") }}
+                                            <label for="star5"></label>
+                                        </span>
+
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div class="form-group">
+                                                        <label>Комментарий</label>
+                                                        {{ form.text(class="form-control", type="text") }}
+                                                    </div>
+                                                </div>
+    <!--                                            <div class="col-lg-4">-->
+    <!--                                                <div class="form-group">-->
+    <!--                                                    <label for="name">Name *</label>-->
+    <!--                                                    <input type="text" id="name" class="form-control">-->
+    <!--                                                </div>-->
+    <!--                                            </div>-->
+    <!--                                            <div class="col-lg-4">-->
+    <!--                                                <div class="form-group">-->
+    <!--                                                    <label for="email">Email *</label>-->
+    <!--                                                    <input type="text" id="email" class="form-control">-->
+    <!--                                                </div>-->
+    <!--                                            </div>-->
+    <!--                                            <div class="col-lg-4">-->
+    <!--                                                <div class="form-group">-->
+    <!--                                                    <label for="website">Website</label>-->
+    <!--                                                    <input type="text" id="website" class="form-control">-->
+    <!--                                                </div>-->
+    <!--                                            </div>-->
+                                                <div class="col-lg-4">
+                                                    <div class="submit-btn">
+    <!--                                                    <a href="/add_coments" class="btn btn-black">-->
+                                                            {{ form.submit(type="submit", class="btn btn-black") }}
+    <!--                                                    </a>-->
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-4">
-                                                <div class="form-group">
-                                                    <label for="name">Name *</label>
-                                                    <input type="text" id="name" class="form-control">
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4">
-                                                <div class="form-group">
-                                                    <label for="email">Email *</label>
-                                                    <input type="text" id="email" class="form-control">
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4">
-                                                <div class="form-group">
-                                                    <label for="website">Website</label>
-                                                    <input type="text" id="website" class="form-control">
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4">
-                                                <div class="submit-btn">
-                                                    <a href="#" class="btn btn-black">Post Comment</a>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </form>
                                 </div>
                             </div>
