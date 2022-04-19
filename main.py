@@ -21,6 +21,7 @@ app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'dnuiwy38noqmcxq8yr1FV&^npmNZB6ernm;s,c/'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
 
 
 def info(id):
@@ -137,6 +138,10 @@ def edit_profile():
         user.email = edit_profile_form.reg_email.data
         user.phone = edit_profile_form.phone.data
 
+        if edit_profile_form.photo.data:
+            edit_profile_form.photo.data.save(f'user_data/user_photo/{current_user.id}.bmp')
+            user.photo_link = f'user_data/user_photo/{current_user.id}.bmp'
+
         db_sess.commit()
 
         if edit_profile_form.old_password.data and edit_profile_form.new_password.data:
@@ -184,6 +189,7 @@ def product(id):
     params, data, book_comments, count = info(id)
     form = AddCommentForm()
     return render_template('product-details.html', params=params, data=data, form=form, book_comments=book_comments, count=count)
+
 
 if __name__ == '__main__':
     db_session.global_init("db/onlineLibrary.db")

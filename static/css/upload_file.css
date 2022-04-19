@@ -1,5 +1,8 @@
 #upload-container label {
      font-weight: bold;
+     margin-top: 13px;
+     margin-bottom: -7px;
+     margin-left: 5px;
 }
 
 #upload-container label:hover {
@@ -8,9 +11,13 @@
 }
 
 #upload-container img {
-     width: 40%;
-     margin-bottom: 20px;
+     margin-top: -40px;
+     margin-bottom: -60px;
      user-select: none;
+}
+
+#upload-container span {
+    margin-left: 12px
 }
 
 #upload-container div {
