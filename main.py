@@ -1,7 +1,7 @@
 import datetime
 import os
 
-from flask import Flask, render_template, redirect, request
+from flask import Flask, render_template, redirect, request, url_for, session
 
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 
@@ -22,6 +22,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'dnuiwy38noqmcxq8yr1FV&^npmNZB6ernm;s,c/'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
+app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=1)
 
 
 def info(id):
@@ -70,6 +71,9 @@ def logout():
 @app.route('/')
 @app.route('/index')
 def index():
+    if not current_user.is_authenticated:
+        session['message'] = 'Зарегистрируйтесь или войдите, чтобы просматривать эту страницу'
+        return redirect(url_for('login'))
     db_sess = db_session.create_session()
     book = db_sess.query(Books).all()
     data = []
@@ -112,7 +116,12 @@ def login():
             return redirect("/")
         return render_template('login-register.html', register_form=register_form, login_form=login_form,
                                message='Неверный логин или пароль', form='login')
-    return render_template('login-register.html', register_form=register_form, login_form=login_form)
+    try:
+        message = session['message']
+        session.pop('message', None)
+        return render_template('login-register.html', register_form=register_form, login_form=login_form, message=message)
+    except Exception:
+        return render_template('login-register.html', register_form=register_form, login_form=login_form)
 
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
