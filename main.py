@@ -55,6 +55,12 @@ def info(id):
     return params, data, book_comments, len(book_comments)
 
 
+def check_user_authorised():
+    if not current_user.is_authenticated:
+        session['message'] = 'Зарегистрируйтесь или войдите, чтобы просматривать эту страницу'
+        return redirect(url_for('login'))
+
+
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
@@ -71,9 +77,8 @@ def logout():
 @app.route('/')
 @app.route('/index')
 def index():
-    if not current_user.is_authenticated:
-        session['message'] = 'Зарегистрируйтесь или войдите, чтобы просматривать эту страницу'
-        return redirect(url_for('login'))
+    if check_user_authorised():
+        return check_user_authorised()
     db_sess = db_session.create_session()
     book = db_sess.query(Books).all()
     data = []
@@ -174,6 +179,8 @@ def edit_profile():
 
 @app.route('/product-details/<int:id>', methods=['GET', 'POST'])
 def product(id):
+    if check_user_authorised():
+        return check_user_authorised()
     db_sess = db_session.create_session()
     if request.method == 'POST':
         form = AddCommentForm()
