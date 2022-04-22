@@ -9,13 +9,11 @@ from data.books import Books
 from data.users import User
 from data.comments import Comment
 from data.user_marks import UserMarks
-from forms.search import SearchForm
 
 from forms.user import RegisterForm, LoginForm, EditProfileForm
 from forms.comments import AddCommentForm
 
 from data import db_session
-
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -87,9 +85,10 @@ def index():
             i.title = i.title[0:14] + '...'
         if len(i.author) > 13:
             i.author = i.author[0:14] + '...'
-        data.append({'title': i.title, 'author': i.author, 'total_amount': i.total_amount, 'amount_in_library': i.amount_in_library, 'image_link': i.image_link})
-    form = SearchForm()
-    return render_template('index.html', data=data, form=form)
+        data.append({'title': i.title, 'author': i.author, 'total_amount': i.total_amount,
+                     'amount_in_library': i.amount_in_library, 'image_link': i.image_link})
+    print(data)
+    return render_template('index.html', data=data, is_find=False)
 
 
 @app.route('/login-register', methods=['GET', 'POST'])
@@ -125,7 +124,8 @@ def login():
     try:
         message = session['message']
         session.pop('message', None)
-        return render_template('login-register.html', register_form=register_form, login_form=login_form, message=message)
+        return render_template('login-register.html', register_form=register_form, login_form=login_form,
+                               message=message)
     except Exception:
         return render_template('login-register.html', register_form=register_form, login_form=login_form)
 
@@ -205,12 +205,34 @@ def product(id):
 
     params, data, book_comments, count = info(id)
     form = AddCommentForm()
-    return render_template('product-details.html', params=params, data=data, form=form, book_comments=book_comments, count=count)
+    return render_template('product-details.html', params=params, data=data, form=form, book_comments=book_comments,
+                           count=count)
+
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     if request.method == "POST":
         need_text = request.form['text']
+        res = []
+        db_sess = db_session.create_session()
+        for book in db_sess.query(Books).all():
+            if need_text.lower() in book.title.lower() or need_text.lower() in book.author.lower():
+                res.append(book)
+        data = result_find(res)
+        return render_template('index.html', data=data, is_find=True)
+
+
+def result_find(res):
+    data = []
+    for i in res:
+        if len(i.title) > 13:
+            i.title = i.title[0:14] + '...'
+        if len(i.author) > 13:
+            i.author = i.author[0:14] + '...'
+        data.append({'id': i.id, 'title': i.title, 'author': i.author, 'total_amount': i.total_amount,
+                     'amount_in_library': i.amount_in_library, 'image_link': i.image_link})
+    print(data)
+    return data
 
 
 if __name__ == '__main__':
