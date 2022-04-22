@@ -9,7 +9,7 @@ from data.books import Books
 from data.users import User
 from data.comments import Comment
 from data.user_marks import UserMarks
-from PIL import Image
+from forms.search import SearchForm
 
 from forms.user import RegisterForm, LoginForm, EditProfileForm
 from forms.comments import AddCommentForm
@@ -75,7 +75,7 @@ def logout():
 
 
 @app.route('/')
-@app.route('/index')
+@app.route('/index', methods=['GET', 'POST'])
 def index():
     if check_user_authorised():
         return check_user_authorised()
@@ -88,7 +88,8 @@ def index():
         if len(i.author) > 13:
             i.author = i.author[0:14] + '...'
         data.append({'title': i.title, 'author': i.author, 'total_amount': i.total_amount, 'amount_in_library': i.amount_in_library, 'image_link': i.image_link})
-    return render_template('index.html', data=data)
+    form = SearchForm()
+    return render_template('index.html', data=data, form=form)
 
 
 @app.route('/login-register', methods=['GET', 'POST'])
@@ -205,6 +206,11 @@ def product(id):
     params, data, book_comments, count = info(id)
     form = AddCommentForm()
     return render_template('product-details.html', params=params, data=data, form=form, book_comments=book_comments, count=count)
+
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    if request.method == "POST":
+        need_text = request.form['text']
 
 
 if __name__ == '__main__':

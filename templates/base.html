@@ -28,10 +28,12 @@
 							</a>
 						</div>
                         <div class="col-lg-5">
-							<div class="header-search-block">
-								<input type="text" placeholder="Search entire store here">
-								<button>Search</button>
-							</div>
+                            <form action="/search" method="post">
+                                <div class="header-search-block">
+                                    <input name="text" type="text" placeholder="Search entire store here">
+                                    <button>Search</button>
+                                </div>
+                            </form>
 						</div>
 						<div class="col-lg-4">
 							<div class="main-navigation flex-lg-right">
