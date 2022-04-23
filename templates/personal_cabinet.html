@@ -772,9 +772,9 @@
 								<div class="row">
 									<div class="col-md-12 col-12 mb--15" id="upload-container">
 										<img id="upload-image" src="../static/img/button_upload_file.bmp" width=120 height=120>
-										{{ edit_profile_form.photo(class="mb-0 form-control", id="file-input", type="file") }}
 										<label for="file-input">Выберите файл</label>
 										<span>для аватарки</span>
+										{{ edit_profile_form.photo(class="mb-0 form-control file-input", id="file-input", type="file", accept="image/*") }}
           							</div>
 									<div class="col-md-12 col-12 mb--15">
 										<label>{{ edit_profile_form.surname.label }}</label>
@@ -981,4 +981,5 @@
 	<script src="js/plugins.js"></script>
 	<script src="js/ajax-mail.js"></script>
 	<script src="js/custom.js"></script>
+	<script src="../static/js/load_file.js"></script>
 {% endblock %}

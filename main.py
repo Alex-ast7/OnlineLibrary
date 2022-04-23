@@ -154,8 +154,8 @@ def edit_profile():
         user.phone = edit_profile_form.phone.data
 
         if edit_profile_form.photo.data:
-            edit_profile_form.photo.data.save(f'user_data/user_photo/{current_user.id}.bmp')
-            user.photo_link = f'user_data/user_photo/{current_user.id}.bmp'
+            edit_profile_form.photo.data.save(f'static/user_data/user_photo/{current_user.id}.bmp')
+            user.photo_link = f'static/user_data/user_photo/{current_user.id}.bmp'
 
         db_sess.commit()
 
