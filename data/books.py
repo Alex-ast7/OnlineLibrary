@@ -24,9 +24,6 @@ class Books(SqlAlchemyBase, SerializerMixin):
     comments = orm.relation("Comment",
                             secondary="association_comments",
                             backref="books")
-    marks = orm.relation("UserMarks",
-                         secondary="association_marks",
-                         backref="books")
 
     def __repr__(self):
         return f'<Book> {self.id}, {self.title}, {self.author}, {self.isbn_13}, {self.total_amount}, {self.amount_in_library}, {self.image_link}'
