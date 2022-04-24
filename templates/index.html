@@ -1024,8 +1024,8 @@
                                                                 </a>
                                                         </div>
                                                         <div class="price-block">
-                                                            <span class="price">10 штук</span>
-                                                            <del class="price-old">из 20</del>
+                                                            <span class="price">{{ item['amount_in_library'] }} штук</span>
+                                                            <del class="price-old">из {{ item['total_amount'] }}</del>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1051,8 +1051,8 @@
                                                             </a>
                                                     </div>
                                                     <div class="price-block">
-                                                        <span class="price">10 штук</span>
-                                                        <del class="price-old">из 20</del>
+                                                        <span class="price">{{ data[item]['amount_in_library'] }} штук</span>
+                                                        <del class="price-old">из {{ data[item]['total_amount'] }}</del>
                                                     </div>
                                                 </div>
                                             </div>
@@ -2807,8 +2807,8 @@
                                               </a></h3>
                                                         </div>
                                                         <div class="price-block">
-                                                            <span class="price">10 штук из</span>
-                                                            <del class="price-old">20</del>
+                                                            <span class="price">{{ data[item]['amount_in_library'] }} штук из</span>
+                                                            <del class="price-old">{{ data[item]['total_amount'] }}</del>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -2977,8 +2977,8 @@
                                                 <h3><a href="/product-details/{{ item + 1}}">{{ data[item]['title'] }}</a></h3>
                                             </div>
                                             <div class="price-block">
-                                                <span class="price">10 штук из</span>
-                                                <del class="price-old">20</del>
+                                                <span class="price">{{ data[item]['amount_in_library'] }} штук из</span>
+                                                <del class="price-old">{{ data[item]['total_amount'] }}</del>
                                             </div>
                                         </div>
                                     </div>

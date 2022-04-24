@@ -1,6 +1,7 @@
 import datetime
 import os
 from json import dumps
+from random import randint
 
 from flask import Flask, render_template, redirect, request, url_for, session
 
@@ -246,11 +247,20 @@ def add_mark(mark_type, book_id):
     db_sess = db_session.create_session()
     mark = db_sess.query(UserMarks).filter(UserMarks.book_id == book_id, UserMarks.user == current_user.id,
                                            UserMarks.type == mark_type).first()
+    book = db_sess.query(Books).filter(Books.id == book_id).first()
     if mark:
         db_sess.delete(mark)
+        if mark_type == 1:
+            book.amount_in_library += 1
     else:
-        mark = UserMarks(type=mark_type, user=current_user.id, book_id=book_id)
-        db_sess.add(mark)
+        if mark_type == 1:
+            if book.amount_in_library >= 1:
+                mark = UserMarks(type=mark_type, user=current_user.id, book_id=book_id)
+                db_sess.add(mark)
+                book.amount_in_library -= 1
+        else:
+            mark = UserMarks(type=mark_type, user=current_user.id, book_id=book_id)
+            db_sess.add(mark)
     db_sess.commit()
     return '<script>document.location.href = document.referrer</script>'
 
@@ -258,4 +268,5 @@ def add_mark(mark_type, book_id):
 if __name__ == '__main__':
     db_session.global_init("db/onlineLibrary.db")
     port = int(os.environ.get("PORT", 5000))
+
     app.run(host='0.0.0.0', port=port)
