@@ -1,5 +1,6 @@
 import datetime
 import os
+from json import dumps
 
 from flask import Flask, render_template, redirect, request, url_for, session
 
@@ -33,6 +34,11 @@ def info(id):
               'amount_in_library': book.amount_in_library,
               'image_link': book.image_link}
 
+    marks_info = {'mark_1': False, 'mark_2': False, 'mark_3': False, 'mark_4': False, 'mark_5': False}
+    marks = db_sess.query(UserMarks).filter(UserMarks.book_id == id, UserMarks.user == current_user.id).all()
+    for i in marks:
+        marks_info[f'mark_{i.type}'] = True
+
     book = db_sess.query(Books).all()
     data = []
     for i in book:
@@ -50,7 +56,7 @@ def info(id):
         for user in db_sess.query(User).filter(User.id == comment.user).all():
             book_comments.append([comment.text, comment.date_time, comment.stars, user.name, user.surname])
 
-    return params, data, book_comments, len(book_comments)
+    return params, data, book_comments, len(book_comments), marks_info
 
 
 def check_user_authorised():
@@ -203,10 +209,10 @@ def product(id):
         db_sess.commit()
         return redirect(f'/product-details/{id}')
 
-    params, data, book_comments, count = info(id)
+    params, data, book_comments, count, marks_info = info(id)
     form = AddCommentForm()
     return render_template('product-details.html', params=params, data=data, form=form, book_comments=book_comments,
-                           count=count)
+                           count=count, id=id, marks_info=marks_info)
 
 
 @app.route('/search', methods=['GET', 'POST'])
@@ -233,6 +239,20 @@ def result_find(res):
                      'amount_in_library': i.amount_in_library, 'image_link': i.image_link})
     print(data)
     return data
+
+
+@app.route('/add_mark/<int:mark_type>/<int:book_id>')
+def add_mark(mark_type, book_id):
+    db_sess = db_session.create_session()
+    mark = db_sess.query(UserMarks).filter(UserMarks.book_id == book_id, UserMarks.user == current_user.id,
+                                           UserMarks.type == mark_type).first()
+    if mark:
+        db_sess.delete(mark)
+    else:
+        mark = UserMarks(type=mark_type, user=current_user.id, book_id=book_id)
+        db_sess.add(mark)
+    db_sess.commit()
+    return '<script>document.location.href = document.referrer</script>'
 
 
 if __name__ == '__main__':
