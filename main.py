@@ -219,6 +219,7 @@ def product(id):
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     if request.method == "POST":
+        is_find_ok = True
         need_text = request.form['text']
         res = []
         db_sess = db_session.create_session()
@@ -226,7 +227,9 @@ def search():
             if need_text.lower() in book.title.lower() or need_text.lower() in book.author.lower():
                 res.append(book)
         data = result_find(res)
-        return render_template('index.html', data=data, is_find=True)
+        if not(data):
+            is_find_ok = False
+        return render_template('index.html', data=data, is_find=True, is_find_ok=is_find_ok)
 
 
 def result_find(res):

@@ -1005,32 +1005,42 @@
 <!--                                    </div>-->
 <!--                                </div>-->
                                 {% if is_find %}
-                                    {% for item in data %}
-                                            <div class="single-slide">
-                                                <div class="product-card">
-                                                    <div class="product-header">
-                                                        <a href="/product-details/{{ item['id']}}" class="author">
-                                                            {{ item['author'] }}
-                                                        </a>
-                                                        <h3><a href="/product-details/{{ item['id']}}">{{ item['title'] }}</a>
-                                                        </h3>
+                                    {% if is_find_ok%}
+                                        {% for item in data %}
+                                                <div class="single-slide">
+                                                    <div class="product-card">
+                                                        <div class="product-header">
+                                                            <a href="/product-details/{{ item['id']}}" class="author">
+                                                                {{ item['author'] }}
+                                                            </a>
+                                                            <h3><a href="/product-details/{{ item['id']}}">{{ item['title'] }}</a>
+                                                            </h3>
 
-                                                    </div>
-                                                    <div class="product-card--body">
-                                                        <div class="card-image">
-
-                                                                <a href="/product-details/{{ item['id']}}" class="hover-image">
-                                                                    <img style="width:128px; height:202px" src="{{ item['image_link'] }}" alt="">
-                                                                </a>
                                                         </div>
-                                                        <div class="price-block">
-                                                            <span class="price">{{ item['amount_in_library'] }} штук</span>
-                                                            <del class="price-old">из {{ item['total_amount'] }}</del>
+                                                        <div class="product-card--body">
+                                                            <div class="card-image">
+
+                                                                    <a href="/product-details/{{ item['id']}}" class="hover-image">
+                                                                        <img style="width:128px; height:202px" src="{{ item['image_link'] }}" alt="">
+                                                                    </a>
+                                                            </div>
+                                                            <div class="price-block">
+                                                                <span class="price">{{ item['amount_in_library'] }} штук</span>
+                                                                <del class="price-old">из {{ item['total_amount'] }}</del>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                    {% endfor %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="single-slide">
+                                                    <div class="product-card">
+                                                        <div class="product-header">
+                                                            <h3>Ничего не найдено</h3>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                    {% endif %}
                                 {% else %}
                                     {% for item in range(8) %}
                                         <div class="single-slide">
