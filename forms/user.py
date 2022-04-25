@@ -10,7 +10,7 @@ class LoginForm(FlaskForm):
 
 
 class RegisterForm(FlaskForm):
-    surname_and_name = StringField('Фамилия и имя', validators=[DataRequired(message='Это поле обязательное')])
+    surname_and_name = StringField('Фамилия имя', validators=[DataRequired(message='Это поле обязательное')])
     reg_email = EmailField('Email', validators=[DataRequired(message='Это поле обязательное')])
     reg_password = PasswordField('Пароль', validators=[DataRequired(message='Это поле обязательное')])
     repeat_password = PasswordField('Повторите пароль',
@@ -27,4 +27,5 @@ class EditProfileForm(FlaskForm):
     phone = StringField('Номер телефона', validators=[])
     old_password = PasswordField('Старый пароль', validators=[])
     new_password = PasswordField('Новый пароль', validators=[])
+    admin_password = PasswordField('Вы администратор? Введите секретный пароль администратора')
     reg_submit = SubmitField('Сохранить')

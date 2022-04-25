@@ -17,6 +17,8 @@ from forms.comments import AddCommentForm
 
 from data import db_session
 
+from config import secret_admin_password
+
 app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -107,7 +109,7 @@ def login():
         if db_sess.query(User).filter(User.email == register_form.reg_email.data).first():
             return render_template('login-register.html', register_form=register_form, login_form=login_form,
                                    message='Такой пользователь уже есть', form='register')
-        user = User(email=register_form.reg_email.data)
+        user = User(email=register_form.reg_email.data, is_admin=False)
         name_surname = register_form.surname_and_name.data.split()
         if len(name_surname) >= 2:
             user.surname = name_surname[0]
@@ -150,6 +152,7 @@ def edit_profile():
         edit_profile_form.name.data = user.name
         edit_profile_form.reg_email.data = user.email
         edit_profile_form.phone.data = user.phone
+        is_admin = user.is_admin
 
     if edit_profile_form.validate_on_submit():
         db_sess = db_session.create_session()
@@ -159,6 +162,8 @@ def edit_profile():
         user.name = edit_profile_form.name.data
         user.email = edit_profile_form.reg_email.data
         user.phone = edit_profile_form.phone.data
+
+        is_admin = user.is_admin
 
         if edit_profile_form.photo.data:
             edit_profile_form.photo.data.save(f'static/user_data/user_photo/{current_user.id}.bmp')
@@ -172,17 +177,28 @@ def edit_profile():
                 db_sess.commit()
             else:
                 return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
-                                       message='Изменения сохранены, но пароль не изменён - старый пароль указан неверно')
+                                       message='Изменения сохранены, но пароль не изменён - старый пароль указан неверно', is_admin=is_admin)
         elif edit_profile_form.old_password.data and not edit_profile_form.new_password.data:
             return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
-                                   message='Изменения сохранены, но пароль не изменён. Заполните поле "Новый пароль"')
+                                   message='Изменения сохранены, но пароль не изменён. Заполните поле "Новый пароль"', is_admin=is_admin)
         elif edit_profile_form.new_password.data and not edit_profile_form.old_password.data:
             return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
-                                   message='Изменения сохранены, но пароль не изменён - для его смены укажите старый пароль')
+                                   message='Изменения сохранены, но пароль не изменён - для его смены укажите старый пароль', is_admin=is_admin)
+
+        admin_password = edit_profile_form.admin_password.data
+        if admin_password:
+            if admin_password == secret_admin_password:
+                user.is_admin = True
+                db_sess.commit()
+                return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
+                                       message='Изменения сохранены, вам присвоен статус администратора', is_admin=True)
+            else:
+                return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
+                                       message='Изменения сохранены, в статусе администратора отказано', is_admin=False)
 
         return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
-                               message='Изменения сохранены')
-    return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form)
+                               message='Изменения сохранены', is_admin=is_admin)
+    return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form, is_admin=is_admin)
 
 
 @app.route('/product-details/<int:id>', methods=['GET', 'POST'])

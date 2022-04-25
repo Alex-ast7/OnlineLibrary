@@ -19,6 +19,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
                               index=True, unique=True, nullable=True)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     photo_link = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    is_admin = sqlalchemy.Column(sqlalchemy.Boolean, nullable=True)
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
