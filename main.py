@@ -7,6 +7,7 @@ from flask import Flask, render_template, redirect, request, url_for, session
 
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 
+from data.user_marks import UserMarks
 from data.books import Books
 from data.users import User
 from data.comments import Comment
@@ -143,6 +144,26 @@ def login():
 @login_required
 def edit_profile():
     edit_profile_form = EditProfileForm()
+    status = {
+        'booked_books': 0,
+        'read_now_books': 0,
+        'read_later_books': 0,
+        'read_past_books': 0,
+        'dropped_books': 0
+    }
+
+    db_sess = db_session.create_session()
+    for book in db_sess.query(UserMarks).filter(UserMarks.user == current_user.id).all():
+        if int(book.type) == 1:
+            status['booked_books'] += 1
+        if int(book.type) == 2:
+            status['read_now_books'] += 1
+        if int(book.type) == 3:
+            status['read_later_books'] += 1
+        if int(book.type) == 4:
+            status['read_past_books'] += 1
+        if int(book.type) == 5:
+            status['dropped_books'] += 1
 
     if request.method == 'GET':
         db_sess = db_session.create_session()
@@ -177,13 +198,16 @@ def edit_profile():
                 db_sess.commit()
             else:
                 return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
-                                       message='Изменения сохранены, но пароль не изменён - старый пароль указан неверно', is_admin=is_admin)
+                                       message='Изменения сохранены, но пароль не изменён - старый пароль указан неверно',
+                                       is_admin=is_admin)
         elif edit_profile_form.old_password.data and not edit_profile_form.new_password.data:
             return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
-                                   message='Изменения сохранены, но пароль не изменён. Заполните поле "Новый пароль"', is_admin=is_admin)
+                                   message='Изменения сохранены, но пароль не изменён. Заполните поле "Новый пароль"',
+                                   is_admin=is_admin)
         elif edit_profile_form.new_password.data and not edit_profile_form.old_password.data:
             return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
-                                   message='Изменения сохранены, но пароль не изменён - для его смены укажите старый пароль', is_admin=is_admin)
+                                   message='Изменения сохранены, но пароль не изменён - для его смены укажите старый пароль',
+                                   is_admin=is_admin)
 
         admin_password = edit_profile_form.admin_password.data
         if admin_password:
@@ -198,7 +222,7 @@ def edit_profile():
 
         return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
                                message='Изменения сохранены', is_admin=is_admin)
-    return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form, is_admin=is_admin)
+    return render_template('personal_cabinet.html', status=status, edit_profile_form=edit_profile_form, is_admin=is_admin)
 
 
 @app.route('/product-details/<int:id>', methods=['GET', 'POST'])
@@ -243,7 +267,7 @@ def search():
             if need_text.lower() in book.title.lower() or need_text.lower() in book.author.lower():
                 res.append(book)
         data = result_find(res)
-        if not(data):
+        if not (data):
             is_find_ok = False
         return render_template('index.html', data=data, is_find=True, is_find_ok=is_find_ok)
 
