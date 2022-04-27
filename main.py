@@ -1,13 +1,10 @@
 import datetime
 import os
-from json import dumps
-from random import randint
 
 from flask import Flask, render_template, redirect, request, url_for, session
 
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 
-from data.user_marks import UserMarks
 from data.books import Books
 from data.users import User
 from data.comments import Comment
@@ -19,6 +16,7 @@ from forms.comments import AddCommentForm
 from data import db_session
 
 from config import secret_admin_password
+
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -38,6 +36,7 @@ def info(id):
               'amount_in_library': book.amount_in_library,
               'image_link': book.image_link}
 
+    # информация об отметках, которые пользователь поставил на эту книгу
     marks_info = {'mark_1': False, 'mark_2': False, 'mark_3': False, 'mark_4': False, 'mark_5': False}
     marks = db_sess.query(UserMarks).filter(UserMarks.book_id == id, UserMarks.user == current_user.id).all()
     for i in marks:
@@ -64,6 +63,7 @@ def info(id):
 
 
 def check_user_authorised():
+    """Перенаправляет пользователя на страницу входа с сообщением о причине редиректа"""
     if not current_user.is_authenticated:
         session['message'] = 'Зарегистрируйтесь или войдите, чтобы просматривать эту страницу'
         return redirect(url_for('login'))
@@ -103,6 +103,7 @@ def index():
 
 @app.route('/login-register', methods=['GET', 'POST'])
 def login():
+    """обработчик для страницы входа и регистрации"""
     register_form = RegisterForm()
     login_form = LoginForm()
     if register_form.validate_on_submit():
@@ -111,6 +112,7 @@ def login():
             return render_template('login-register.html', register_form=register_form, login_form=login_form,
                                    message='Такой пользователь уже есть', form='register')
         user = User(email=register_form.reg_email.data, is_admin=False)
+        # разделение данных из строки с именем и фамилией на имя и фамилию
         name_surname = register_form.surname_and_name.data.split()
         if len(name_surname) >= 2:
             user.surname = name_surname[0]
@@ -120,6 +122,7 @@ def login():
         user.set_password(register_form.reg_password.data)
         db_sess.add(user)
         db_sess.commit()
+        # вход в аккаунт
         user = db_sess.query(User).filter(User.email == register_form.reg_email.data).first()
         login_user(user)
         return redirect('/')
@@ -132,16 +135,21 @@ def login():
         return render_template('login-register.html', register_form=register_form, login_form=login_form,
                                message='Неверный логин или пароль', form='login')
     try:
+        # если на эту страницу был выполнен редирект из функции check_user_authorised,
+        # в message попадет сообщение из этой функции
         message = session['message']
         session.pop('message', None)
         return render_template('login-register.html', register_form=register_form, login_form=login_form,
                                message=message)
     except Exception:
+        # если сообщения нет, возникает ошибка
         return render_template('login-register.html', register_form=register_form, login_form=login_form)
 
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 def edit_profile():
+    """обработчик для личного кабинета"""
+    # если пользователь не авторизован, он будет перенаправлен на страницу входа
     if check_user_authorised():
         return check_user_authorised()
     edit_profile_form = EditProfileForm()
@@ -188,30 +196,31 @@ def edit_profile():
         is_admin = user.is_admin
 
         if edit_profile_form.photo.data:
+            # сохранение аватарки
             edit_profile_form.photo.data.save(f'static/user_data/user_photo/{current_user.id}.bmp')
             user.photo_link = f'static/user_data/user_photo/{current_user.id}.bmp'
 
         db_sess.commit()
 
         if edit_profile_form.old_password.data and edit_profile_form.new_password.data:
-            if user.check_password(edit_profile_form.old_password.data):
+            if user.check_password(edit_profile_form.old_password.data):  # пароль не совпал со старым
                 user.set_password(edit_profile_form.new_password.data)
                 db_sess.commit()
             else:
                 return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
                                        message='Изменения сохранены, но пароль не изменён - старый пароль указан неверно',
                                        is_admin=is_admin, status=status)
-        elif edit_profile_form.old_password.data and not edit_profile_form.new_password.data:
+        elif edit_profile_form.old_password.data and not edit_profile_form.new_password.data:  # было заполнено только поле "старый пароль"
             return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
                                    message='Изменения сохранены, но пароль не изменён. Заполните поле "Новый пароль"',
                                    is_admin=is_admin, status=status)
-        elif edit_profile_form.new_password.data and not edit_profile_form.old_password.data:
+        elif edit_profile_form.new_password.data and not edit_profile_form.old_password.data:  # было заполнено только поле "новый пароль"
             return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
                                    message='Изменения сохранены, но пароль не изменён - для его смены укажите старый пароль',
                                    is_admin=is_admin, status=status)
 
         admin_password = edit_profile_form.admin_password.data
-        if admin_password:
+        if admin_password:  # присваивание статуса администратора
             if admin_password == secret_admin_password:
                 user.is_admin = True
                 db_sess.commit()
@@ -292,11 +301,14 @@ def result_find(res):
 
 @app.route('/get_my_marks/<int:mark_id>')
 def get_user_marks(mark_id):
+    """обработчик страницы, на которой пользователь может посмотреть, на какие книги он ставил метки"""
+    # проверка, что пользователь авторизован
     if check_user_authorised():
         return check_user_authorised()
     is_find_ok = True
     res = []
     db_sess = db_session.create_session()
+    # id всех книг, на которые ставил отметки этого типа этот пользователь
     book_ids = db_sess.query(UserMarks).filter(UserMarks.user == current_user.id, UserMarks.type == mark_id).all()
     for book_id in book_ids:
         book = db_sess.query(Books).filter(Books.id == book_id.book_id).first()
@@ -317,6 +329,8 @@ def get_user_marks(mark_id):
 
 @app.route('/add_mark/<int:mark_type>/<int:book_id>')
 def add_mark(mark_type, book_id):
+    """добавляет метку в бд"""
+    # проверка, что пользователь авторизован
     if check_user_authorised():
         return check_user_authorised()
     db_sess = db_session.create_session()
@@ -324,19 +338,26 @@ def add_mark(mark_type, book_id):
                                            UserMarks.type == mark_type).first()
     book = db_sess.query(Books).filter(Books.id == book_id).first()
     if mark:
+        # если такая метка уже есть, удаляем ее
         db_sess.delete(mark)
         if mark_type == 1:
+            # типу меток 1 соответствует бронь книги в библиотеке,
+            # поэтому отмена этой метки увеличивает количество книг, имеющихся в наличии
             book.amount_in_library += 1
     else:
+        # добавление метки
         if mark_type == 1:
+            # аналогично с предыдущим, кол-во книг в наличии уменьшается (если эта книга вообще есть в наличии)
             if book.amount_in_library >= 1:
                 mark = UserMarks(type=mark_type, user=current_user.id, book_id=book_id)
                 db_sess.add(mark)
                 book.amount_in_library -= 1
         else:
+            # добавление метки в бд
             mark = UserMarks(type=mark_type, user=current_user.id, book_id=book_id)
             db_sess.add(mark)
     db_sess.commit()
+    # редирект на страницу, с которой пришел пользователь
     return '<script>document.location.href = document.referrer</script>'
 
 
