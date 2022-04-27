@@ -82,7 +82,9 @@
                                 <label>{{ edit_profile_form.admin_password.label }}</label>
                                 {{ edit_profile_form.admin_password(class="mb-0 form-control", placeholder="Введите пароль администратора") }}
                                 {% else %}
-                                <label style="margin-left: 30px">Вы уже администратор</label>
+                                <div class="col-md-12">
+                                    <a href="/admin" class="btn btn-outlined">Добавить книгу</a>
+                                </div>
                                 {% endif %}
                                 <br>
                             </div>

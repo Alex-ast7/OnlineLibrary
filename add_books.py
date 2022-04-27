@@ -3,13 +3,11 @@ from data import db_session
 from isbn_books import books
 from data.books import Books
 
-db_session.global_init('db/onlineLibrary.db')
 
-dbsess = db_session.create_session()
-
-for i in books:
+def add_book(isbn):
+    dbsess = db_session.create_session()
     try:
-        data = requests.get(f'https://www.googleapis.com/books/v1/volumes?q={i}').json()
+        data = requests.get(f'https://www.googleapis.com/books/v1/volumes?q={isbn}').json()
         title = data['items'][0]['volumeInfo']['title']
         description = data['items'][0]['volumeInfo']['description']
         author = ', '.join(data['items'][0]['volumeInfo']['authors'])
@@ -18,8 +16,9 @@ for i in books:
         genre = ', '.join(data['items'][0]['volumeInfo']['categories'])
         image_link = data['items'][0]['volumeInfo']['imageLinks']['thumbnail']
         language = data['items'][0]['volumeInfo']['language']
-        add = Books(title=title, author=author, description=description, isbn_13=isbn_13, isbn_10=isbn_10, genre=genre, image_link=image_link, language=language)
+        add = Books(title=title, author=author, description=description, isbn_13=isbn_13, isbn_10=isbn_10, genre=genre,
+                    image_link=image_link, language=language)
         dbsess.add(add)
         dbsess.commit()
-    except Exception:
-        pass
+    except Exception as e:
+        print(e)

@@ -9,6 +9,7 @@ from data.books import Books
 from data.users import User
 from data.comments import Comment
 from data.user_marks import UserMarks
+from add_books import add_book
 
 from forms.user import RegisterForm, LoginForm, EditProfileForm
 from forms.comments import AddCommentForm
@@ -16,7 +17,6 @@ from forms.comments import AddCommentForm
 from data import db_session
 
 from config import secret_admin_password
-
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -234,7 +234,8 @@ def edit_profile():
 
         return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
                                message='Изменения сохранены', is_admin=is_admin, status=status)
-    return render_template('personal_cabinet.html', status=status, edit_profile_form=edit_profile_form, is_admin=is_admin)
+    return render_template('personal_cabinet.html', status=status, edit_profile_form=edit_profile_form,
+                           is_admin=is_admin)
 
 
 @app.route('/product-details/<int:id>', methods=['GET', 'POST'])
@@ -359,6 +360,24 @@ def add_mark(mark_type, book_id):
     db_sess.commit()
     # редирект на страницу, с которой пришел пользователь
     return '<script>document.location.href = document.referrer</script>'
+
+
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    if check_user_authorised():
+        return check_user_authorised()
+    if request.method == 'GET':
+        is_admin = False
+        db_sess = db_session.create_session()
+        a = db_sess.query(User.is_admin).filter(User.id == current_user.id).all()
+        print(a)
+        if a[0][0]:
+            is_admin = True
+        return render_template('admin.html', is_admin=is_admin)
+    elif request.method == 'POST':
+        isbn = request.form['text_isbn']
+        add_book(isbn)
+        return redirect('/')
 
 
 if __name__ == '__main__':
