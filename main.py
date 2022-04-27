@@ -141,8 +141,9 @@ def login():
 
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
-@login_required
 def edit_profile():
+    if check_user_authorised():
+        return check_user_authorised()
     edit_profile_form = EditProfileForm()
     status = {
         'booked_books': 0,
@@ -199,15 +200,15 @@ def edit_profile():
             else:
                 return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
                                        message='Изменения сохранены, но пароль не изменён - старый пароль указан неверно',
-                                       is_admin=is_admin)
+                                       is_admin=is_admin, status=status)
         elif edit_profile_form.old_password.data and not edit_profile_form.new_password.data:
             return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
                                    message='Изменения сохранены, но пароль не изменён. Заполните поле "Новый пароль"',
-                                   is_admin=is_admin)
+                                   is_admin=is_admin, status=status)
         elif edit_profile_form.new_password.data and not edit_profile_form.old_password.data:
             return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
                                    message='Изменения сохранены, но пароль не изменён - для его смены укажите старый пароль',
-                                   is_admin=is_admin)
+                                   is_admin=is_admin, status=status)
 
         admin_password = edit_profile_form.admin_password.data
         if admin_password:
@@ -215,13 +216,15 @@ def edit_profile():
                 user.is_admin = True
                 db_sess.commit()
                 return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
-                                       message='Изменения сохранены, вам присвоен статус администратора', is_admin=True)
+                                       message='Изменения сохранены, вам присвоен статус администратора', is_admin=True,
+                                       status=status)
             else:
                 return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
-                                       message='Изменения сохранены, в статусе администратора отказано', is_admin=False)
+                                       message='Изменения сохранены, в статусе администратора отказано', is_admin=False,
+                                       status=status)
 
         return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
-                               message='Изменения сохранены', is_admin=is_admin)
+                               message='Изменения сохранены', is_admin=is_admin, status=status)
     return render_template('personal_cabinet.html', status=status, edit_profile_form=edit_profile_form, is_admin=is_admin)
 
 
@@ -258,6 +261,8 @@ def product(id):
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
+    if check_user_authorised():
+        return check_user_authorised()
     if request.method == "POST":
         is_find_ok = True
         need_text = request.form['text']
@@ -285,9 +290,10 @@ def result_find(res):
     return data
 
 
-@login_required
 @app.route('/get_my_marks/<int:mark_id>')
 def get_user_marks(mark_id):
+    if check_user_authorised():
+        return check_user_authorised()
     is_find_ok = True
     res = []
     db_sess = db_session.create_session()
@@ -311,6 +317,8 @@ def get_user_marks(mark_id):
 
 @app.route('/add_mark/<int:mark_type>/<int:book_id>')
 def add_mark(mark_type, book_id):
+    if check_user_authorised():
+        return check_user_authorised()
     db_sess = db_session.create_session()
     mark = db_sess.query(UserMarks).filter(UserMarks.book_id == book_id, UserMarks.user == current_user.id,
                                            UserMarks.type == mark_type).first()
