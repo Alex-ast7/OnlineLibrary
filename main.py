@@ -141,8 +141,9 @@ def login():
 
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
-@login_required
 def edit_profile():
+    if check_user_authorised():
+        return check_user_authorised()
     edit_profile_form = EditProfileForm()
     status = {
         'booked_books': 0,
@@ -260,6 +261,8 @@ def product(id):
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
+    if check_user_authorised():
+        return check_user_authorised()
     if request.method == "POST":
         is_find_ok = True
         need_text = request.form['text']
@@ -287,9 +290,10 @@ def result_find(res):
     return data
 
 
-@login_required
 @app.route('/get_my_marks/<int:mark_id>')
 def get_user_marks(mark_id):
+    if check_user_authorised():
+        return check_user_authorised()
     is_find_ok = True
     res = []
     db_sess = db_session.create_session()
@@ -313,6 +317,8 @@ def get_user_marks(mark_id):
 
 @app.route('/add_mark/<int:mark_type>/<int:book_id>')
 def add_mark(mark_type, book_id):
+    if check_user_authorised():
+        return check_user_authorised()
     db_sess = db_session.create_session()
     mark = db_sess.query(UserMarks).filter(UserMarks.book_id == book_id, UserMarks.user == current_user.id,
                                            UserMarks.type == mark_type).first()
