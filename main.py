@@ -25,7 +25,7 @@ app.config['SECRET_KEY'] = 'dnuiwy38noqmcxq8yr1FV&^npmNZB6ernm;s,c/'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=1)
 
-
+# функция получения информации о книгах по id
 def info(id):
     db_sess = db_session.create_session()
 
@@ -45,6 +45,7 @@ def info(id):
     book = db_sess.query(Books).all()
     data = []
     for i in book:
+        # сокращение названия и автора для отображения
         if len(i.title) > 13:
             i.title = i.title[0:14] + '...'
         if len(i.author) > 13:
@@ -81,7 +82,7 @@ def logout():
     logout_user()
     return redirect("/login-register")
 
-
+# обработчик главной страницы
 @app.route('/')
 @app.route('/index', methods=['GET', 'POST'])
 def index():
@@ -90,6 +91,7 @@ def index():
     db_sess = db_session.create_session()
     book = db_sess.query(Books).all()
     data = []
+    # формирование информации
     for i in book:
         if len(i.title) > 13:
             i.title = i.title[0:14] + '...'
@@ -236,17 +238,19 @@ def edit_profile():
                                message='Изменения сохранены', is_admin=is_admin, status=status)
     return render_template('personal_cabinet.html', status=status, edit_profile_form=edit_profile_form, is_admin=is_admin)
 
-
+# обработчик страницы книги
 @app.route('/product-details/<int:id>', methods=['GET', 'POST'])
 def product(id):
     if check_user_authorised():
         return check_user_authorised()
     db_sess = db_session.create_session()
+    # форма и обработка комментариев
     if request.method == 'POST':
         form = AddCommentForm()
         comment = Comment()
         comment.text = form.text.data
         comment.user = current_user.id
+        # подсчёт количесвта поставленных звёзд
         if form.star1.data:
             comment.stars = 5
         elif form.star2.data:
@@ -267,7 +271,7 @@ def product(id):
     return render_template('product-details.html', params=params, data=data, form=form, book_comments=book_comments,
                            count=count, id=id, marks_info=marks_info)
 
-
+# обработчик поиска
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     if check_user_authorised():
@@ -277,6 +281,7 @@ def search():
         need_text = request.form['text']
         res = []
         db_sess = db_session.create_session()
+        # нахождение подстроки в названии или авторе
         for book in db_sess.query(Books).all():
             if need_text.lower() in book.title.lower() or need_text.lower() in book.author.lower():
                 res.append(book)
@@ -285,7 +290,7 @@ def search():
             is_find_ok = False
         return render_template('index.html', data=data, is_find=True, is_find_ok=is_find_ok)
 
-
+# формирование данных о найденной книге
 def result_find(res):
     data = []
     for i in res:
