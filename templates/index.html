@@ -908,6 +908,9 @@
 <!--                        </li>-->
 <!--                    </ul>-->
                     <div class="tab-content" id="myTabContent">
+                        {% if message %}
+                        <h3 style="text-align: left; line-height: 3; width: 400%; font-weight: 500; margin-top: -140px; font-size: 1.5rem">{{ message }}</h3>
+                        {% endif %}
                         <div class="tab-pane show active" id="shop" role="tabpanel" aria-labelledby="shop-tab">
                             <div class="product-slider multiple-row  slider-border-multiple-row  sb-slick-slider"
                                 data-slick-setting='{

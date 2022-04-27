@@ -285,6 +285,30 @@ def result_find(res):
     return data
 
 
+@login_required
+@app.route('/get_my_marks/<int:mark_id>')
+def get_user_marks(mark_id):
+    is_find_ok = True
+    res = []
+    db_sess = db_session.create_session()
+    book_ids = db_sess.query(UserMarks).filter(UserMarks.user == current_user.id, UserMarks.type == mark_id).all()
+    for book_id in book_ids:
+        book = db_sess.query(Books).filter(Books.id == book_id.book_id).first()
+        res.append(book)
+    data = result_find(res)
+    if not data:
+        is_find_ok = False
+    marks_info = {
+        1: 'бронируете',
+        2: 'читаете сейчас',
+        3: 'хотели прочитать позже',
+        4: 'прочитали',
+        5: 'бросили'
+    }
+    return render_template('index.html', data=data, is_find=True, is_find_ok=is_find_ok,
+                           message=f'Книги, которые вы {marks_info[mark_id]}')
+
+
 @app.route('/add_mark/<int:mark_type>/<int:book_id>')
 def add_mark(mark_type, book_id):
     db_sess = db_session.create_session()
