@@ -199,15 +199,15 @@ def edit_profile():
             else:
                 return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
                                        message='Изменения сохранены, но пароль не изменён - старый пароль указан неверно',
-                                       is_admin=is_admin)
+                                       is_admin=is_admin, status=status)
         elif edit_profile_form.old_password.data and not edit_profile_form.new_password.data:
             return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
                                    message='Изменения сохранены, но пароль не изменён. Заполните поле "Новый пароль"',
-                                   is_admin=is_admin)
+                                   is_admin=is_admin, status=status)
         elif edit_profile_form.new_password.data and not edit_profile_form.old_password.data:
             return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
                                    message='Изменения сохранены, но пароль не изменён - для его смены укажите старый пароль',
-                                   is_admin=is_admin)
+                                   is_admin=is_admin, status=status)
 
         admin_password = edit_profile_form.admin_password.data
         if admin_password:
@@ -215,13 +215,15 @@ def edit_profile():
                 user.is_admin = True
                 db_sess.commit()
                 return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
-                                       message='Изменения сохранены, вам присвоен статус администратора', is_admin=True)
+                                       message='Изменения сохранены, вам присвоен статус администратора', is_admin=True,
+                                       status=status)
             else:
                 return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
-                                       message='Изменения сохранены, в статусе администратора отказано', is_admin=False)
+                                       message='Изменения сохранены, в статусе администратора отказано', is_admin=False,
+                                       status=status)
 
         return render_template('personal_cabinet.html', edit_profile_form=edit_profile_form,
-                               message='Изменения сохранены', is_admin=is_admin)
+                               message='Изменения сохранены', is_admin=is_admin, status=status)
     return render_template('personal_cabinet.html', status=status, edit_profile_form=edit_profile_form, is_admin=is_admin)
 
 
